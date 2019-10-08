@@ -1,0 +1,82 @@
+.table-box {
+  margin-top: 24px;
+}
+
+.table-box div:nth-child(2) {
+  flex: 1
+}
+
+.table-box .table-bordered {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+
+
+.table-box .table-title:nth-child(1) {
+  border-right: 1px solid #ddd;
+}
+
+.table-content-box {
+  margin-top: 24px;
+}
+
+td,
+th {
+  height: 51px;
+}
+
+/* .table-box .table-th{
+background: #5987cf;
+} */
+.detail-desc {
+  margin: 28px 28px 30px 28px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+
+}
+
+
+
+.table-box .table-title {
+  color: #fff;
+  text-align: center;
+  background: #5987cf;
+  height: 38px;
+  line-height: 38px;
+}
+
+
+.tab-btn span:nth-child(1) {
+  background: #5987cf;
+}
+
+.tab-btn span:nth-child(2) {
+  color: #5987cf;
+  border-color: #5987cf;
+}
+
+.tab-btn span:nth-child(3) {
+  background: #5987cf;
+}
+
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+
+.pagination td,
+.pagination th {
+  height: 0;
+}
+
+.table-box .table {
+  margin-bottom: 0;
+}

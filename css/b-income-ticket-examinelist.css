@@ -1,0 +1,32 @@
+.tab-btn span:nth-child(1) {
+  background: #5987cf;
+}
+
+.tab-btn span:nth-child(2) {
+  color: #5987cf;
+  border-color: #5987cf;
+}
+
+.tab-btn span:nth-child(3) {
+  background: #5987cf;
+}
+.table-box .table-th{
+  background: #5987cf;
+}
+
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+.pagination td,.pagination  th{
+  height: 0;
+}
+.table-box .table{
+  margin-bottom: 0;
+}

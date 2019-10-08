@@ -1,0 +1,86 @@
+.form-box {
+  position: relative;
+}
+.form-box .form-item {
+  width: 25%;
+}
+.form-box .form-item .label-item {
+  /* width: 25%; */
+}
+.form-box .form-item .form-control {
+  /* width: 66%; */
+}
+.form-box .flex-sb-center {
+  justify-content: flex-start;
+}
+.form-box .operator-btn.flex-sb-center {
+  justify-content: flex-end;
+}
+.form-box .search-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.table-box .btn-items {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ccc;
+}
+.table-box .operator-btn {
+  /* margin-bottom: 12px; */
+}
+.table-box .operator-btn button:nth-child(2) {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.table-box .operator-btn .plr15 {
+  padding: 0 15px;
+}
+.table-box .operator-btn .plr29 {
+  padding: 0 29px;
+}
+.table-box .form-group {
+  width: 33%;
+  margin-top: 15px;
+}
+.table-box .form-group .form-control {
+  width: 50%;
+}
+
+.table-box .form-group:not(:last-child){
+    margin-right: 20px;
+}
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+.pagination td,.pagination  th{
+  height: 0;
+}
+.table-box .table{
+  margin-bottom: 0;
+}
+
+/* 弹窗 */
+#myModal{
+  top: 30%;
+}
+#myModal .modal-dialog{
+  width: 450px;
+}
+.modal-header{
+  border-bottom: none;
+}
+.modal-body{
+  text-align: center;
+}
+.modal-footer{
+  text-align: center;
+  border-top: none;
+}

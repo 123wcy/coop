@@ -1,0 +1,16 @@
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+.pagination td,.pagination  th{
+  height: 0;
+}
+.table-box .table{
+  margin-bottom: 0;
+}

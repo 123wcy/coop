@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-发票管理销项票审核</title>
+    
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/wu/reset.css">
+    <link rel="stylesheet" href="../css/wu/common.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/layui.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/modules/laydate/default/laydate.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+
+    <script src="../lib/vue.js"></script>
+    <script src="../lib/axios.js"></script>
+    <script src="../lib/layui-master/dist/layui.js"  charset="utf-8"></script>
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.6.0/qs.min.js"></script>
+    <script src="../lib/elementui/index.js"></script>
+    <script src="../lib/polyfill.min.js"></script>
+    <script src="../lib/browser.min.js"></script>
+
+    <!-- 引入样式 -->
+    <!-- <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css"> -->
+    <!-- 引入组件库 -->
+    <!-- <script src="../lib/elementui/index.js"></script> -->
+
+</head>
+
+<body>
+    <div class="enter-record" id="app">
+        <!-- 上 -->
+        <div class="nav-header">
+
+        </div>
+
+        <div class="container">
+            <!-- 左 -->
+            <div class="nav-left" v-cloak>
+                <p><a href="">销项票审核</a></p>
+                <p><a href="./b-income-ticket-examinelist.html">进项票审核</a></p>
+                <p><a href="./b-income-ticket-waitDealInvoice.html">待处理票据</a></p>
+                <p><a href="./b-income-ticket-waitenter.html">进项票录入</a></p>
+                <p><a href="./InvoiceManagementSalesmanQuery.html">发票查询</a></p>
+                <p><a href="./InvoiceManagementCustomerInformation.html">客户资料</a></p>
+            </div>
+
+            <!-- 右 -->
+            <div class="nav-right">
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>销项票审核列表</span><span></span>
+                    </div>
+                </div>
+
+                <div class="form-box">
+                    <form role="form" class="flex-start-center">
+                        <div class="form-group flex-end-center form-item" style="width: 35%;">
+                            <span class="label-item">申请时间:</span>
+                             <input type="text" id="test1" placeholder="请选择日期" autocomplete="off" v-model="applyDate0"/>
+                            <!--<input type="date" class="form-control" style="width: 34%;margin-right:10px">-->
+                            <span style="margin: 0 10px 0 10px;">至</span>
+                             <input type="text" id="test2" placeholder="请选择日期" autocomplete="off" v-model="applyDate1" />
+                            <!--<input type="date" class="form-control" style="width: 34%">-->
+                        </div>
+                        <div class="form-group flex-end-center form-item" style="width: 21%;" >
+                            <span class="label-item">委托会员:</span>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="form-group flex-end-center form-item" style="width: 20%;">
+                            <span class="label-item">发票状态:</span>                       
+                            <select class="form-control"> 
+                            	<option value="">全部</option>
+                                <option value="1">已保存</option>
+                                <option value="2">待审核</option>
+                                <option value="3">已撤销</option>
+                                <option value="4">出票中</option>
+                                <option value="5">未通过</option>
+                                <option value="6">待作废</option>
+                                <option value="7">作废中</option>
+                                <option value="8">未作废</option>
+                                <option value="9">已出票</option>
+                                <option value="10">出票失败</option>
+                                <option value="11">作废失败</option>
+                                <option value="12">已作废</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-end-center form-item" style="width: 21%;">
+                            <span class="label-item">发票类型:</span>
+                            <select class="form-control">             
+                                <option value="1">增值税专用发票</option>
+                                <option value="2">普通发票</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group flex-end-center form-item" >
+                            <span class="label-item">收票单位:</span>
+                            <input type="text" class="form-control">
+                        </div>
+                        <div class="form-group flex-end-center form-item" style="width: 25%;">
+                            <span class="label-item">发票编号:</span>
+                            <input type="text" class="form-control">
+                        </div>
+                        
+                        <div class="form-group search-btn form-item" style="text-align: right;width: 40%">
+                            <button class="o-btn b-defalut-btn prm12" style="margin-right: 0" type="button" @click="submitBilling">查询</button>
+                            <button class="o-btn b-defalut-btn"@click="resetBut" >重置</button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <!-- table -->
+                <div class="table-box">
+                    <div class="table-content-box">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-th">
+                                        <th>操作</th>
+                                        <th>申请时间</th>
+                                        <th>状态</th>
+                                        <th>发票类型</th>
+                                        <th>收票单位</th>
+                                        <th>发票编号</th>
+                                        <th>开票时间</th>
+                                        <th>发票金额</th>
+                                        <th>委托会员</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-if='tableList.length==0'><td colspan='11'>没有找到匹配的记录</td></tr>
+                                <tr v-cloak v-for="(item,index) in tableList">
+                                        <td>
+                                        	<a href="#" v-show="item.billStatus==1||item.billStatus==2||item.billStatus==3||item.billStatus==4||item.billStatus==5||item.billStatus==6||item.billStatus==7||item.billStatus==8||item.billStatus==9||item.billStatus==10||item.billStatus==11||item.billStatus==12" @click="detailsPage(item)" >详情</a>
+                                            <a href="#" v-show="item.billStatus==2" data-toggle="modal" data-target="#myModal" @click="operatingModel(item,1)">通过</a>
+                                            <a href="#" v-show="item.billStatus==2" data-toggle="modal" data-target="#myModal" @click="operatingModel(item,1)">不通过</a>
+                                            <a href="#" v-show="item.billStatus==6" data-toggle="modal" data-target="#myModal" @click="operatingModel(item,2)" @click.prevent="voidClick(item)">作废</a>
+                                            <a href="#" v-show="item.billStatus==4||item.billStatus==8||item.billStatus==9||item.billStatus==11" data-toggle="modal" data-target="#myModal" @click="operatingModel(item,3)">作废</a>
+                                            <a href="#" v-show="item.billStatus==6" data-toggle="modal" data-target="#myModal" @click="operatingModel(item,2)" @click.prevent="voidClick(item)">不作废</a>
+                                        </td>
+                                        <td>{{item.applyDate}}</td>
+                                        <td>
+                                        	{{item.billStatus == 1?"已保存":""}}
+                                        	{{item.billStatus == 2?"待审核":""}}
+                                        	{{item.billStatus == 3?"已撤销":""}}
+                                        	{{item.billStatus == 4?"出票中":""}}
+                                        	{{item.billStatus == 5?"未通过":""}}
+                                        	{{item.billStatus == 6?"待作废":""}}
+                                        	{{item.billStatus == 7?"作废中":""}}
+                                        	{{item.billStatus == 8?"未作废":""}}
+                                        	{{item.billStatus == 9?"已出票":""}}
+                                        	{{item.billStatus == 10?"出票失败":""}}
+                                        	{{item.billStatus == 11?"作废失败":""}}
+                                        	{{item.billStatus == 12?"作废成功":""}}
+                                        </td>
+                                        <td>{{item.billPaperType == 1?"增值税发票":"普通发票"}}</td>
+                                        <td>{{item.receiveCompany}}</td>
+                                        <td>{{item.billCode}}</td>
+                                        <td>{{item.billCreateDate}}</td>
+                                        <td>{{item.billTotalAccount}}</td>
+                                        <td>{{item.memberName}}</td>
+                                    </tr>
+                                    <tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- 分页 -->
+                <div id="pagination" class="easyui-panel">
+                    <div class="easyui-pagination"></div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!--模态框-->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background:#5987cf;color: #FFFFFF;border-color:#5987cf;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" style="text-align: center;font-size: large;" v-show="showButton == 1">发票信息确认</h4>
+                        <h4 class="modal-title" style="text-align: center;font-size: large;" v-show="showButton == 2">作废审核</h4>
+                        <h4 class="modal-title" style="text-align: center;font-size: large;" v-show="showButton == 3">发票作废</h4>
+                    </div>
+                    <div class="modal-body">
+					<table class="table table-bordered" style="margin-bottom: 0;">
+							<tbody v-cloak>
+                                <tr>
+                                <td colspan="2">
+                                   发票信息
+                                </td>
+                                <td v-show="showButton == 1">
+                                    审核原因
+                                </td>
+                                <td v-show="showButton == 2">
+                                    申请原因
+                                </td>
+                                <td v-show="showButton == 3">
+                                    作废原因
+                                </td>
+                                </tr>
+                                <tr>
+                                	<th>发票金额</th>
+                                    <td>{{operatingList.billTotalAccount | moneyFilter}}</td>
+                                    <td rowspan="6" v-show="showButton == 1" style="padding: 0px;">
+                                        <textarea v-model="introduct" placeholder="请输入审核原因！" style="height: 300px;"></textarea>
+                                    </td>
+                                    <td rowspan="2" v-show="showButton == 2" style="padding: 0px;">
+                                        <textarea v-model="reason"  style="height:100px;" readonly></textarea>
+                                    </td>
+                                    <td rowspan="6" v-show="showButton == 3" style="padding: 0px;">
+                                        <textarea v-model="introduct" placeholder="请输入作废原因" style="height: 300px;"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>发票类型</th>
+                                    <td>{{operatingList.billPaperType == 1?"增值税发票":"普通发票"}}</td>
+
+                                </tr>
+                                <tr>
+                                	<th>业务类型</th>
+                                    <td>销项票</td>
+                                    <td v-show="showButton == 2">
+                                        审核原因
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>客户名称</th>
+                                    <td>{{operatingList.memberName}}</td>
+                                    <td v-show="showButton == 2" rowspan="3" style="padding: 0px;">
+                                        <textarea v-model="introduct"  style="height:150px;" placeholder="请输入审核原因！"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                	<th>收票单位</th>
+                                    <td>{{operatingList.receiveCompany}}</td>
+                                </tr>                                
+                                <tr>
+                                    <th>申请时间</th>
+                                    <td>{{operatingList.applyDate}}</td>
+                                </tr>
+							</tbody>
+					</table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" style="background:#5987cf;color: #FFFFFF;border-color:#5987cf;float:left;" @click="detailsModelPage">查看详情</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" style="background:#FFFFFF;color: #5987cf;border-color:#5987cf;float:left;">取消</button>
+                        <button v-cloak v-show="showButton == 1" type="button" class="btn btn-default" style="background:#5987cf;color: #FFFFFF;border-color:#5987cf;" @click="byModel(1,1)">通过</button>
+                        <button v-cloak v-show="showButton == 1" type="button" class="btn btn-primary" style="background:#E84125;color: #FFFFFF;border-color:#E84125;" @click="byModel(2,1)">不通过</button>
+                        <button v-cloak v-show="showButton == 2" type="button" class="btn btn-default" style="background:#E84125;color: #FFFFFF;border-color:#E84125;" @click="byModel(1,2)">作废</button>
+                        <button v-cloak v-show="showButton == 3" type="button" class="btn btn-default" style="background:#E84125;color: #FFFFFF;border-color:#E84125;" @click="byModel(1,3)">作废</button>
+                        <button v-cloak v-show="showButton == 2" type="button" class="btn btn-primary" style="background:#5987cf;color: #FFFFFF;border-color:#5987cf;" @click="byModel(2,2)">不作废</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        
+    </div>
+
+    <script src="../js/wang/filters.js"></script>
+    <script src="../lib/jquery.easyui.min.js"></script>
+    <script src="../js/y_sales_review_list.js"></script>
+</body>
+
+</html>
+<script>
+
+
+</script>
+<style>
+    textarea {
+        width: 100%;
+        resize : none;
+        text-indent: 10px;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+    .modal-body table td ,.modal-body table th{
+        height: 37px;
+        color: #3d3d3d;
+        font-size: 12px;
+    }
+    .modal-body table tr>th:nth-child(1) {
+        width: 100px;
+    }
+    .modal-body table tr>td:nth-child(2) {
+        width: 200px;
+    }
+    .modal-body table tr>td:nth-child(3) {
+        width: 280px;
+    }
+    .modal-header .close {
+        color: #fff;
+        opacity: inherit;
+        margin-top: auto;
+    }
+     .table-th {
+        background: #5987cf;
+        color: #fff;
+    }
+
+     .tab-btn span:nth-child(1) {
+        background: #5987cf;
+    }
+
+    .tab-btn span:nth-child(2) {
+        color: #5987cf;
+        border-color: #5987cf;
+    }
+
+    .tab-btn span:nth-child(3) {
+        background: #5987cf;
+    }
+    /* 分页 */
+	.panel-htop {
+	  width: 95%;
+	  margin: 0 auto;
+	}
+	.pagination {
+	  display: block;
+	  margin: 0;
+	  width: auto !important;
+	}
+	.pagination td,.pagination  th{
+	  height: 0;
+	}
+	.table-box .table{
+	  margin-bottom: 0;
+	}
+	#test1,#test2{
+   	display: block;
+   	width: 35%;
+   	height: 34px;
+   	padding: 6px 12px;
+   	font-size: 14px;
+   	line-height: 1.4287143px;
+   	color: #555555;
+   	background-color: #FFFFFF;
+   	background-image: none;
+   	border: 1px solid #ccc;
+   	border-radius: 4px;
+   }
+   #test1,#test2 input{
+   	margin-left: 10px;
+   }
+   [v-cloak]{ display: none;}
+</style>
+

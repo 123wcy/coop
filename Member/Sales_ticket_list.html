@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<meta http-equiv="X-UA-Compatible" content="ie=edge">-->
+    <title>中实交易-销项票申请</title>
+    
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../css/Sales_ticket_list.css" />
+    
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script src="../lib/axios.js"></script>
+    
+    <script src="https://cdn.bootcss.com/qs/6.6.0/qs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+    <script src="http://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script>
+    <script src="../lib/browser.min.js"></script>
+    <script src="../lib/polyfill.min.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <!-- 上 -->
+        <div class="nav-header">
+        </div>
+
+        <div class="container">
+            <!-- 左 -->
+            <div class="nav-left">
+                <p><a href="#" @click="salesTicketBut">销项票申请</a></p>
+                <p><a href="../wu/income-ticket-waitenter.html">进项票录入</a></p>
+                <p><a href="../wu/income-ticket-waitDealInvoice.html">待处理票据</a></p>
+                <p><a href="../wu/InvoiceManagementBillInquiry.html">发票查询</a></p>
+                <p><a href="./InvoiceManagementCustomerInformation.html">客户资料</a></p>
+            </div>
+
+            <!-- 右 -->
+            <div class="nav-right">
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>销项票待开列表</span><span></span>
+                    </div>
+                </div>
+
+
+                <div class="form-box">
+                    <form role="form" class="flex-sb-center">
+                        <div class="form-group flex-sb-center form-item">
+                            <span for="ages" class="label-item">合同编号:</span>
+                            <input type="text" class="form-control" v-model="contractNumber">
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span for="name" class="label-item">商品名称:</span>
+                            <input type="text" class="form-control" v-model="name">
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">规格:</span>
+                            <input type="text" class="form-control" v-model="spec">
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">批号:</span>
+                            <input type="text" class="form-control" v-model="batch">
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">采购商:</span>
+                            <input type="text" class="form-control" v-model="supply">
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">仓库:</span>
+                            <input type="text" class="form-control" v-model="warehouse">
+                        </div>
+                        <div class="search-btn form-item" style="flex: 1;text-align: right">
+                        	<button class="o-btn submit-btn" type="button" @click="resetBut">重置</button>
+                            <button class="o-btn submit-btn" type="button" style="margin-right:0" @click="searchs">查询</button>
+                        </div>
+                    </form>
+                </div>
+
+
+                <!-- table -->
+                <div class="table-box">
+                    <div class="btn-items">
+                        <div class="flex-sb-center" style="margin-bottom: 20px" >
+                            <div class="operator-btn" v-if="!isShow">
+                                <button v-if="buttonShow" class="o-btn submit-btn plr15" :disabled="disabled" @click="invoiceInput">申请开票</button>
+                                <button v-if="buttonShow" class="o-btn submit-btn plr15"  @click="batchInput">开票记录</button>
+                                <button  class="o-btn submit-btn plr15" v-show="determineShow" :disabled="disabled" @click="invoiceInput">确定</button>
+                            </div>
+
+                            <div style="flex: 1;text-align: right">
+                                <button class="o-btn neworder-btn" type="button" id="expor-table" @click="onexport"  style="margin-right: 0">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-sb-center flex-sb-contract">
+                    	<div class="contract">
+                    		已选合同：
+                    	</div>
+                    	<div class="selectedCon">
+                    		<div class="form-group flex-start-center">
+	                            <span class="label-item">进项票余额:</span>
+	                            <span v-cloak >{{balanceMoney}}</span>
+	                        </div>
+	                        <div class="form-group flex-start-center">
+	                            <span class="label-item">已开销项票重量:</span>
+	                            <span v-cloak >{{overchargedItem}}</span>
+	                        </div>
+	                        <div class="form-group flex-start-center">
+	                            <span class="label-item">已录进项票重量:</span>
+	                            <span v-cloak >{{recordedItem}}</span>
+	                        </div>
+	                        <div class="form-group flex-start-center">
+	                            <span class="label-item">待开销项票重量合计:</span>
+	                            <span v-cloak >{{enteredMoney}}</span>
+	                        </div>
+	                        <div class="form-group flex-start-center">
+	                            <span class="label-item">待开销项票总额合计:</span>
+	                            <span v-cloak >{{incomeMoney}}</span>
+	                        </div>
+	                    	</div>
+                    </div>
+                </div>
+                <!-- table -->
+                <div class="table-box">
+                    <div class="table-content-box">
+                        <div>
+                            <table class="table table-bordered" id="out-table">
+                                <thead>
+                                    <tr class="table-th">
+                                        <th width="6%"><input type="checkbox" v-model="allcheckbox" @change="allCheck"></th>
+                                        <th>销售合同编号</th>
+                                        <th>商品名称</th>
+                                        <th>商品批号</th>
+                                        <th>规格</th>
+                                        <th>待开票重量</th>
+                                        <th>单价(元/吨)</th>
+                                        <th>已录进项票重量</th>
+                                        <th>已开销项票重量</th>
+                                        <th>待审核销项票重量</th>
+                                        <th>商品金额</th>
+                                        <th>采购商</th>
+                                        <th>仓库</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-cloak v-for="(item,index) in list" :key="">
+                                        <td>
+                                           <input type="checkbox" v-model="item.checked" @change="singleCheck(item,index)">
+                                        </td> 
+                                        <td>{{item.contractNumber}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td>{{item.batch}}</td>
+                                        <td>{{item.spec}}</td>
+                                        <td>{{item.outweight}}</td>
+                                        <td>{{item.price}}</td>
+                                        <td>{{item.inweight}}</td>
+                                        <td>{{item.outputCount}}</td>
+                                         <td>{{item.pendingWeight}}</td>
+                                        <td>{{item.outTotalMoney}}</td>
+                                        <td>{{item.supply}}</td>
+                                        <td>{{item.warehouse}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 分页 -->
+                <div id="pagination" class="easyui-panel">
+                    <div class="easyui-pagination"></div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- 提示弹窗 -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                        </button>
+                        <!-- <h4 class="modal-title" id="myModalLabel">
+                            模态框（Modal）标题
+                        </h4> -->
+                    </div>
+                    <div class="modal-body">
+                            所选商品供应商不同，请选择采购商相同的商品。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            关闭
+                        </button>
+                        <!-- <button type="button" class="btn btn-primary">
+                            提交更改
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <script src="../lib/jquery.easyui.min.js"></script>
+    <script src="../js/Sales_ticket_list.js"></script>
+
+</body>
+
+</html>
+

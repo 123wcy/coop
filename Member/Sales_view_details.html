@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-销项查看详情</title>
+    
+    <!-- <link rel="stylesheet" href="./css/bootstrap.css"> -->
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/reset.css">
+    <link rel="stylesheet" href="../css/common.css">
+
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./css/income-ticket-entering.css" /> -->
+    
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script src="../lib/axios.js"></script>
+
+    <script src="../lib/elementui/index.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.6.0/qs.min.js"></script>
+    <script src="../lib/polyfill.min.js"></script>
+    <script src="../lib/browser.min.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <!-- 上 -->
+        <!--<div class="nav-header">
+
+        </div>-->
+
+        <div class="container">
+            <!-- 右 -->
+            <div class="nav-right">
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>销项票开票详情</span><span></span>
+                    </div>
+                    <div class="operator-btn">
+                    	<!--<button class="o-btn b-defalut-btn" @click="submit">提交</button>-->
+                        <button class="o-btn b-defalut-btn" v-cloak v-show="item.billStatus==4||item.billStatus==8||item.billStatus==9||item.billStatus==11" data-target="#myModal2" @click="compileOutBillById(1)">申请作废</button>
+                        <button class="o-btn b-defalut-btn" v-cloak v-show="item.billStatus==2" @click="compileOutBillById(2)">撤销</button>
+                        <button class="o-btn b-defalut-btn" v-cloak v-show="item.billStatus==1" @click="compileOutBillById(3)">编辑</button>
+                        <button class="o-btn b-warning-btn"  v-cloak  @click="compileOutBillById(4)">返回</button>
+                    </div>
+                </div>                
+                 <div class="detail-desc infmation" v-cloak v-for="(item,index) in Out_hisList" style="font-weight: bold;color: #FF0000;">
+                    <span class="glyphicon glyphicon-info-sign" :style="{'color':index==0?'#e84125':'#ffffff'}"></span>
+                    <span v-bind:style="{'color':index==0?'#e84125':'#999999'}">{{item.updatedate}}</span>
+                    <span v-bind:style="{'color':index==0?'#e84125':'#999999'}">
+                    	{{item.billType==1?"已保存":""}}
+                    	{{item.billType==2?"待审核":""}}
+                    	{{item.billType==3?"已撤销":""}}
+                    	{{item.billType==4?"出票中":""}}
+                    	{{item.billType==5?"未通过":""}}
+                    	{{item.billType==6?"待作废":""}}
+                    	{{item.billType==7?"作废中":""}}
+                    	{{item.billType==8?"未作废":""}}
+                    	{{item.billType==9?"已出票":""}}
+                    	{{item.billType==10?"出票失败":""}}
+                    	{{item.billType==11?"作废失败 ":""}}
+                    	{{item.billType==12?"已作废 ":""}}             	
+                    </span>
+                    <span>
+                        {{item.updatereason}}
+                    </span>
+                </div>
+                <div class="form-box">
+                    <form role="form" class="flex-start-center">
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">收票单位:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.receiveCompany" disabled>
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">发票类型:</span>
+                            <select class="form-control" v-cloak v-model="item.billPaperType" disabled>                   
+                                <option value="1">增值税专用发票</option>
+                                <option value="2">普通发票</option>
+                            </select>                           
+                        </div>
+                        <div class="form-group flex-sb-center form-item taxRate">
+                            <span class="label-item">税率:</span>
+                            <span v-cloak class="form-control" style="background:#EEEEEE;">
+                            	{{Outbill.taxRate}}
+                            </span>
+                            <span class="percentage">%</span>
+                        </div>
+                       
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">开户银行:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.openBank" disabled>
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">银行账号:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.openAccount" disabled>
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">纳税人识别号:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.taxpayerCode" disabled>
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">收票地址:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.receiveAddress" disabled>
+                        </div>
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">联系电话:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.phone" disabled>
+                        </div>
+                         <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">开票总额:</span>
+                            <input type="text" class="form-control" v-cloak v-model="Outbill.billTotalAccount" disabled>
+                        </div>
+
+                    </form>
+                </div>
+                <!-- table -->
+                <div class="table-box">
+                    <div class="btn-items">
+                        <div class="flex-sb-center">
+                            <div class="operator-btn">
+                                <!-- <button class="o-btn neworder-btn plr15">新增订单</button>
+                                <button class="o-btn submit-btn plr15">匹配已录入发票</button> -->
+                            </div>
+                            <div >
+                                <div class="form-group flex-sb-center" style="width: 40%;float: right;">
+                                    <span class="label-item">最迟补票:</span>
+                                    <input type="text" class="form-control" v-cloak v-model="Outbill.supplyTerm" disabled>
+                                </div>
+                                 <div class="form-group flex-sb-center" style="width: 40%;float: right;margin-right: 50px;">
+                                    <span class="label-item">借票金额:</span>
+                                    <input type="text" class="form-control" v-cloak v-model="Outbill.replaceMoney" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="table-content-box flex-sb-center-nowrap" >
+
+                        <table class="table table-bordered" v-cloak>
+
+                            <thead>
+                            <tr class="table-title">
+                                <th colspan="7" style="width: 48%" >销售合同信息</th>
+                                <th colspan="3">历史发票信息</th>
+                                <th colspan="3" style="width: 20%" >销项票信息</th>
+                            </tr>
+                            <tr>
+                                <th>销售合同编号</th>
+                                <th>商品名称</th>
+                                <th>批号</th>
+                                <th>规格</th>
+                                <th>待开票重量(吨)</th>
+                                <th>单价(元/吨)</th>
+                                <th>商品金额(元)</th>
+                                <th>已录进项票重量(吨)</th>
+                                <th>已开销项票重量(吨)</th>
+                                <th>待审核销项票重量(吨)</th>
+                                <th>申请开票重量(吨)</th>
+                                <th>申请开票单价(元/吨)</th>
+                                <th>申请开票金额(元)</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr v-for="(item, index) in tableData" :key="index" class="input-box" v-cloak>
+                                <td>{{item.contractNumber}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.batch}}</td>
+                                <td>{{item.spec}}</td>
+                                <td>{{item.outweight}}</td>
+                                <td>{{item.price}}</td>
+                                <td>{{item.outTotalMoney}}</td>
+                                <td>{{item.inweight}}</td>
+                                <td>{{item.outputCount}}</td>
+                                <td>{{item.pendingWeight}}</td>
+                                <td>{{item.applyCount}}</td>
+                                <td>{{item.applyPrice}}</td>
+                                <td>{{item.applyTotalPrice}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                    <!--收货确认单-->
+				    <div class="">
+				        	收货确认单： <a href="#" @click="DownloadText" v-cloak>{{Outbill.receiveBill}}</a>
+				    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--模态框-->
+
+
+        <!--申请作废模态框  -->
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background:#42a26b;color: #FFFFFF;border-color:#5987cf;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" style="text-align: center;font-size: large;font-weight: 700;">申请作废</h4>
+                        <!--<h4 class="modal-title" style="text-align: center;" id="myModalLabel" >申请作废理由</h4>-->
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered" style="margin-bottom: 0;">
+                            <tbody v-cloak>
+                            <tr>
+                                <td colspan="2">
+                                    发票信息
+                                </td>
+                                <td>
+                                    审核原因
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发票金额</th>
+                                <td>{{item.billTotalAccount | moneyFilter}}</td>
+                                <td rowspan="6" style="padding: 0px;">
+                                    <textarea v-model="reason" placeholder="请输入审核原因！" style="height: 300px;"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发票类型</th>
+                                <td>{{item.billPaperType == 1?"增值税发票":"普通发票"}}</td>
+
+                            </tr>
+                            <tr>
+                                <th>业务类型</th>
+                                <td>销项票</td>
+                            </tr>
+                            <tr>
+                                <th>收票单位：</th>
+                                <td v-cloak >{{item.receiveCompany}}</td>
+                            </tr>
+                            <tr>
+                                <th>申请时间：</th>
+                                <td v-cloak >{{item.applyDate}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" style="background:#42a26b;color: #FFFFFF;border-color:#42a26b;float:left;" data-dismiss="modal">查看详情</button>
+                        <button type="button" class="btn btn-default" style="background:#FF0000;color: #FFFFFF;" @click="descArea">确定作废</button>
+                        <button type="button" class="btn btn-primary" style="background:#42a26b;color: #FFFFFF;border-color:#42a26b;" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background:#42a26b;color: #FFFFFF;border-color:#42a26b;text-align: center;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel" v-cloak  style="text-align: center;font-size: large;font-weight: 700;">{{modelTitle}}</h4>
+                    </div>
+                    <div class="modal-body modalCenter">
+                         <textarea v-cloak v-if="modelCenter == 1" name="" rows="" cols="" style="width: 500px;height:70px;border: 1px solid #e0e0e0;" v-model="reason"></textarea>                            
+                         <span v-cloak v-if="modelCenter==2" >{{modelTitle}}此销项票申请么？</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" style="background:#ff0000;color: #FFFFFF;" v-cloak v-if="modelCenter==1" @click="descArea">{{confirmBut}}</button>
+                        <button type="button" class="btn btn-default" style="background:#ff0000;color: #FFFFFF;" v-cloak v-if="modelCenter==2" @click="confirmCancellation">{{confirmBut}}</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" style="background:#42a26b;color: #FFFFFF;border-color:#42a26b;">
+                                                              取消
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+
+    </div>
+
+
+    <script src="../js/wang/filters.js"></script>
+
+    <script   src="../js/Sales_view_details.js"></script>
+
+</body>
+
+</html>
+
+
+<style>
+    textarea {
+        width: 100%;
+        resize : none;
+        text-indent: 10px;
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+    .modal-body table td ,.modal-body table th{
+        height: 37px;
+        color: #3d3d3d;
+        font-size: 12px;
+    }
+    .modal-body table tr>th:nth-child(1) {
+        width: 100px;
+    }
+    .modal-body table tr>td:nth-child(2) {
+        width: 200px;
+    }
+    .modal-body table tr>td:nth-child(3) {
+        width: 280px;
+    }
+    .modal-header .close {
+        color: #fff;
+        opacity: inherit;
+        margin-top: auto;
+    }
+    .table-box {
+        margin-top: 24px;
+    }
+
+
+    .table-box .table-bordered {
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+
+   
+    .table-box .table-title:nth-child(1) {
+        border-right: 1px solid #ddd;
+    }
+
+    .table-content-box {
+        margin-top: 24px;
+    }
+
+    td,
+    th {
+        height: 51px;
+    }
+
+
+
+
+    .detail-desc {
+        margin: 28px 28px 30px 28px;
+        border-bottom: none !important;
+     
+    }
+    
+    .infmation{
+    	margin: 8px 18px 20px 53px !important;
+    	padding-bottom: 0 !important;
+    	border-bottom: none !important;
+    }
+    
+    .table-th {
+        background: #5987cf;
+        color: #fff;
+    }
+    .table-box .table-title {
+        color: #fff;
+        text-align: center;
+        background: #42a26b;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .b-defalut-btn:nth-child(1){
+    	background-color: #42a26b;
+	    border-radius: 4px;
+	    border: solid 1px #42a26b;
+    }
+    .b-defalut-btn:nth-child(2){
+    	background-color: #42a26b;
+	    border-radius: 4px;
+	    border: solid 1px #42a26b;
+    }
+    .b-defalut-btn:nth-child(3){
+    	background-color: #42a26b;
+	    border-radius: 4px;
+	    border: solid 1px #42a26b;
+    }
+    .b-defalut-btn:nth-child(4){
+    	background-color: #42a26b;
+	    border-radius: 4px;
+	    border: solid 1px #42a26b;
+    }
+      
+.form-item .label-item{
+    width: 22%;
+}
+
+.taxRate{
+	position: relative;
+}
+
+.taxRate .percentage{
+	position: absolute;
+	right:10px;
+}
+.modalCenter{
+	text-align: center;
+}
+[v-cloak]{ display: none;}
+</style>

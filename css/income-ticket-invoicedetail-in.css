@@ -1,0 +1,55 @@
+/* .table-box div:nth-child(2) {
+  flex: 1
+} */
+.table-box {
+  margin-top: 24px;
+}
+.table-box div:nth-child(2) {
+  flex: 1
+}
+.table-box div:nth-child(1){
+  flex: 4;
+}
+
+.table-box .table-bordered {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.table-box .table-title {
+  color: #fff;
+  text-align: center;
+  background: #43a16c;
+  height: 38px;
+  line-height: 38px;
+}
+
+.table-box .table-title:nth-child(1) {
+  border-right: 1px solid #ddd;
+}
+
+.table-content-box {
+  margin-top: 24px;
+}
+
+td,
+th {
+  height: 51px;
+}
+
+
+
+
+.detail-desc {
+  margin: 28px 28px 30px 28px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+}
+.detail-desc div{
+  margin-bottom: 20px;
+}
+.detail-desc div span:nth-child(1){
+  display: inline-block;
+  width: 14px;
+  height: 16px;
+}

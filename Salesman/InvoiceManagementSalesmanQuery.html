@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>发票管理-票据查询</title>
+    <!-- jquery -->
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <!-- 自己的样式 -->
+    <link rel="stylesheet" href="../css/wu/style.css">
+    <link rel='stylesheet' href="../css/reset.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/layui-master/dist/css/modules/laydate/default/laydate.css">
+    <!-- import CSS -->
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+
+
+    <script src="../lib/jquery.easyui.min.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.2.5/polyfill.js"></script>
+    <script src="../lib/axios.js"></script>
+    <script src="../lib/layui-master/dist/layui.js"  charset="utf-8"></script>
+    <link rel="stylesheet" href="../css/wu/common.css">
+
+    <script src="../js/wu/qs.js"></script>
+    <script src="../js/wu/utils.js"></script>
+
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+    <script src="../lib/elementui/index.js"></script>
+
+    <style>
+        .panel-htop {
+            width: 100%
+        }
+    
+        .el-table .table-header {
+            color: #fff;
+            background-color: #5987cf !important;
+        }
+    
+        .el-table .table-header th {
+            text-align: center;
+        }
+    
+        .main .rightpad .right-main .right-top .tab-bar {
+            border-bottom: 1px solid #5987cf;
+        }
+    
+        .main .rightpad .right-main .right-top .tab-bar .tabs-p {
+            border-top: 1px solid #5987cf;
+            border-right: 1px solid #5987cf;
+            border-left: 1px solid #5987cf;
+            color: #5987cf;
+            font-weight: 800;
+            background-color: #fff;
+        }
+    
+        .main .rightpad .right-main .right-top .tab-bar .tabs-active {
+            background-color: #fff;
+            color: #797979;
+            border-color: #bfbfbf;
+            font-weight: 500;
+            border-bottom: 1px solid #5987cf;
+        }
+    
+        #detailModal table thead {
+            font-size: 14px;
+            color: #ffffff;
+            background-color: #5987cf;
+        }
+        .el-icon-arrow-right {
+            width: 13px;
+            height: 13px;
+            background: url(../img/shouqi.png) no-repeat;
+        }
+    
+        #detailModal .modal-dialog {
+            width: 1000px;
+        }
+    </style>
+   
+
+</head>
+<body>
+<div id="app">
+    <!-- 上 -->
+    <!--<div class="nav-header">-->
+    <!--</div>-->
+    <div class="container">
+        <!-- 左 -->
+        <!--<div class="nav-left">-->
+            <!--<p><a href="../Salesman/y_sales_review_list.html">销项票审核</a></p>-->
+            <!--<p><a href="./b-income-ticket-examinelist.html">进项票审核</a></p>-->
+            <!--<p><a href="../Salesman/b-income-ticket-waitDealInvoice.html">待处理票据</a></p>-->
+            <!--<p><a href="./b-income-ticket-waitenter.html">进项票录入</a></p>-->
+            <!--<p><a href="">发票查询</a></p>-->
+            <!--<p><a href="../Salesman/InvoiceManagementCustomerInformation.html">客户资料</a></p>-->
+        <!--</div>-->
+
+        <!-- 右 -->
+        <div class="nav-right" v-loading="loading">
+            <div class="container_fluid bgck">
+                <div class="">
+                    <div class="main">
+                        <div class="rightpad">
+                            <div class="right-main">
+                                <div class="rightpad">
+                                    <div class="right-top">
+                                        <div class="fl margin20" style="width:100%;">
+                                            <ul class="tab-bar">
+                                                <li class="tabs-p" href="#invoice" data-toggle="tab"
+                                                    @click="toSearch(1)" style="margin-left:25px;">
+                                                    按发票查询
+                                                </li>
+                                                <li class="tabs-p tabs-active" href="#commodity" data-toggle="tab"
+                                                    @click="toSearch(2)">
+                                                    按商品查询
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div id="myTabContent" class="tab-content">
+                                        <!--按票-->
+                                        <div id="invoice" class="tab-pane fade in active">
+                                            <div class="form-box" style="margin:0;border: none;">
+                                                <form role="form" class="flex-start-center">
+
+                                                    <div class="form-group flex-sb-center-nowrap form-item"
+                                                         style="width: 25%;">
+                                                        <span class="label-item">票据类型:</span>
+                                                        <select class="form-control" v-model="searchList.billType">
+                                                            <option value="1">进项票</option>
+                                                            <option value="2">销项票</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">发票编码:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="searchList.billcode">
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">来票单位:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="searchList.invoiceUnit">
+                                                    </div>
+                                                    <div class="form-group flex-sb-center-nowrap form-item"
+                                                         style="width: 25%">
+                                                        <span class="label-item">发票类型:</span>
+                                                        <select class="form-control" style="width: 70%"
+                                                                v-model="searchList.billPaperType">
+                                                            <option value="2">普通发票</option>
+                                                            <option value="1">增值税专用发票</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item  form-item-date"
+                                                         style="width: 50%">
+                                                        <span class="label-item">开票时间:</span>
+                                                        <input   type="text" id="startTime"  class="form-control" autocomplete="off"
+                                                                 style="width: 41%;margin-right: 10px;"
+                                                                 v-model="searchList.billcreatedate0">
+                                                        <span>至</span>
+                                                        <input type="text"  id="endTime" class="form-control" style="width: 40%" autocomplete="off"
+                                                               v-model="searchList.billcreatedate1">
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">委托会员:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="searchList.memberName">
+                                                    </div>
+                                                    <div class="form-group search-btn form-item ps-btn"
+                                                         style="text-align: right;width: 25%">
+                                                        <button class="o-btn neworder-btn mr12"
+                                                                @click.prevent="reset(1)">重置
+                                                        </button>
+                                                        <button class="o-btn neworder-btn mr12"
+                                                                @click.prevent="toSearch(1)">查询
+                                                        </button>
+                                                        <button class="o-btn mr0 neworder-btn" style="margin-right: 0"
+                                                                @click.prevent="exportExcell(1)">导出
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+
+                                            <div>
+                                                <el-table
+                                                        :data="invoiceDataList"
+                                                        header-row-class-name="table-header"
+                                                        border
+                                                        @selection-change="handleSelectionChange"
+                                                        @expand-change="expandChange"
+                                                        header-align="center"
+                                                        style="width: 100%">
+                                                    <el-table-column
+                                                            type="selection"
+                                                            width="55">
+                                                    </el-table-column>
+                                                    <el-table-column type="expand" class="second-el-table">
+                                                        <template slot-scope="props">
+                                                            <el-table :border="false"
+                                                                      :data="props.row.invoiceDetailResponeList"
+                                                                      class="demo-table-expand flex-sb-center">
+                                                                <el-table-column label="商品名称" prop="goodsName">
+                                                                    <template slot-scope="props">
+                                                                        <el-button type="text" size="small"
+                                                                                   @click="detailDialog(props.row.pid)">
+                                                                            {{props.row.goodsName}}
+                                                                        </el-button>
+                                                                    </template>
+                                                                </el-table-column>
+                                                                <el-table-column label="规格"
+                                                                                 prop="goodsSpec"></el-table-column>
+                                                                <el-table-column label="商品重量（吨）"
+                                                                                 prop="goodsWeight"
+
+                                                                                 ></el-table-column>
+                                                                <el-table-column label="单价（元/吨）"
+                                                                                 prop="goodsPrice" 
+
+                                                                                 ></el-table-column>
+                                                                <el-table-column label="商品金额（元）"
+                                                                                 prop="goodsTotalPrice"
+                                                                                 ></el-table-column>
+                                                                <el-table-column label="所属合同"
+                                                                                 prop="contractNumber"></el-table-column>
+                                                            </el-table>
+                                                        </template>
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="发票编码"
+                                                            prop="billCode"
+                                                    >
+                                                        <template slot-scope="props">
+                                                            <el-button type="text" size="small"
+                                                                       @click="toDetail(props.row.id,props.row.billType)">
+                                                                {{props.row.billCode}}
+                                                            </el-button>
+                                                        </template>
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="开票时间"
+                                                            prop="billCreateDate">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="发票单位"
+                                                            prop="invoiceUnit">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="发票类型"
+                                                            prop="billPaperType">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="税率（%）"
+                                                            prop="taxRate">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="发票金额（元）"
+                                                            prop="invoiceMoney"
+                                                            >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="票据类型"
+                                                            prop="billType">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="委托会员"
+                                                            prop="memberName">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <!--按商品-->
+                                        <div id="commodity" class="tab-pane fade">
+                                            <div class="form-box" style="margin:0;border: none;">
+                                                <form role="form" class="flex-start-center">
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">商品名称:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="shopSearchList.name"
+                                                        >
+                                                    </div>
+                                                    <div class="form-group flex-start-center form-item"
+                                                         style="width: 25%">
+                                                        <span class="label-item">商品规格:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="shopSearchList.spec"
+                                                        >
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">商品批号:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="shopSearchList.batch"
+                                                        >
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">仓库:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="shopSearchList.warehouse"
+                                                        >
+                                                    </div>
+                                                    <div class="form-group flex-sb-center form-item" style="width: 25%">
+                                                        <span class="label-item">存货人:</span>
+                                                        <input type="text" class="form-control" style="width: 70%"
+                                                               v-model="shopSearchList.memberName"
+                                                        >
+                                                    </div>
+                                                    <div class="form-group search-btn form-item ps-btn"
+                                                         style="text-align: right;width: 75%">
+
+                                                        <button class="o-btn submit-btn mr12 neworder-btn"
+                                                                @click.prevent="reset(2)">重置
+                                                        </button>
+                                                        <button class="o-btn submit-btn mr12 neworder-btn"
+                                                                @click.prevent="searchClick(2)">查询
+                                                        </button>
+                                                        <button class="o-btn mr0 neworder-btn" style="margin-right: 0"
+                                                                @click.prevent="exportExcell(2)">导出
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                                            <div>
+                                                <el-table :data="shopDataList"
+                                                          header-row-class-name="table-header"
+                                                          border
+                                                          @selection-change="handleSelectionChange"
+                                                          @expand-change="expandChange"
+                                                          style="width: 100%">
+                                                    <el-table-column
+                                                            type="selection"
+                                                            width="55">
+                                                    </el-table-column>
+                                                    <el-table-column type="expand">
+                                                        <template slot-scope="props">
+                                                            <el-table label-position="center" border
+                                                                      :data="props.row.ticketlist"
+                                                                      class="demo-table-expand ">
+                                                                <el-table-column label="发票编号" prop="billCode"
+                                                                                 style="cursor: pointer;">
+                                                                    <template slot-scope="props">
+                                                                        <el-button type="text" size="small"
+                                                                                   @click="toDetail(props.row.id,props.row.ticketType)">
+                                                                            {{props.row.billCode}}
+                                                                        </el-button>
+                                                                    </template>
+                                                                </el-table-column>
+                                                                <el-table-column label="重量（吨）"
+                                                                                 prop="goodsWeight"
+                                                                ></el-table-column>
+                                                                <el-table-column label="单价（元/吨）"
+                                                                                 prop="goodsPrice"
+                                                                ></el-table-column>
+                                                                <el-table-column label="商品金额（元）"
+                                                                                 prop="goodsTotalPrice"
+                                                                ></el-table-column>
+                                                                <el-table-column label="发票类型"
+                                                                                 prop="billPaperType"></el-table-column>
+                                                                <el-table-column label="开票时间"
+                                                                                 prop="billCreateDate"></el-table-column>
+                                                                <el-table-column label="票据类型"
+                                                                                 prop="ticketType"></el-table-column>
+                                                                <el-table-column label="交易客户"
+                                                                                 prop="company"></el-table-column>
+                                                                <el-table-column label="委托会员"
+                                                                                 prop="memberName"></el-table-column>
+                                                            </el-table>
+                                                        </template>
+                                                    </el-table-column>
+
+                                                    <el-table-column
+                                                            label="商品名称"
+                                                            prop="name">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="批号"
+                                                            prop="batch">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="规格"
+                                                            prop="spec">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="入库重量（吨）"
+                                                            prop="weight"
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="进项票重量（吨）"
+                                                            prop="inweight"
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="进项票总额（元）"
+                                                            prop="goodsTotalPrice"
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="销售合同总重量（吨）"
+                                                            prop="outWeight"
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="销项票重量（吨）"
+                                                            prop="outputCount"
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="销项票总额（元）"
+                                                            prop="applyTotalPrice"
+
+                                                    >
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="仓库"
+                                                            prop="warehouse">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                            label="存货人"
+                                                            prop="memberName">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+
+                                            <!-- 分页 -->
+                                            <!-- <div id="pagination" class="easyui-panel">
+                                               <div class="easyui-pagination"></div>
+                                           </div> -->
+
+
+                                        </div>
+
+
+                                        <!-- 分页 -->
+                                        <div id="pagination" class="easyui-panel">
+                                            <div class="easyui-pagination"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品详情弹窗 -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        商品详情
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>商品名称</td>
+                            <td>批号</td>
+                            <td>规格</td>
+                            <td>入库重量（吨）</td>
+                            <td>进项票重量（吨）</td>
+                            <td>进项票总额（元）</td>
+                            <td>出库重量（吨）</td>
+                            <td>销项票重量（吨）</td>
+                            <td>销项票总额（元）</td>
+                            <td>仓库</td>
+                            <td>存货人</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-cloak>
+                            <td>{{goodDetail.good.goodName}}</td>
+                            <td>{{goodDetail.good.batch}}</td>
+                            <td>{{goodDetail.good.spec}}</td>
+                            <td>{{goodDetail.good.rkWeight}}</td>
+                            <td>{{goodDetail.good.jxpWeight}}</td>
+                            <td>{{goodDetail.good.jxpZe}}</td>
+                            <td>{{goodDetail.good.ckWeight}}</td>
+                            <td>{{goodDetail.good.xxpWeight}}</td>
+                            <td>{{goodDetail.good.xxpZe}}</td>
+                            <td>{{goodDetail.good.warehouse}}</td>
+                            <td>{{goodDetail.good.memberName}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>发票编码</td>
+                            <td>重量（吨）</td>
+                            <td>单价（元/吨）</td>
+                            <td>商品金额（元）</td>
+                            <td>发票类型</td>
+                            <td>开票时间</td>
+                            <td>票据类型</td>
+                            <td>交易客户</td>
+                            <td>委托会员</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for='(item,index) in goodDetail.goodBills' :key='index' v-cloak>
+                            <td>{{item.billCode}}</td>
+                            <td>{{item.weight}}</td>
+                            <td>{{item.price}}</td>
+                            <td>{{item.money}}</td>
+                            <td>{{item.billPaperType}}</td>
+                            <td>{{item.time}}</td>
+                            <td>{{item.billType}}</td>
+                            <td>{{item.company}}</td>
+                            <td>{{item.memberName}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="../js/wu/InvoiceManagementSalesmanQuery.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("li.tabs-p").eq(2).addClass("tabs-active");
+        $('li.tabs-p').click(function () {
+            $(this).removeClass('tabs-active').siblings().addClass('tabs-active');
+        })
+    });
+</script>
+
+</body>
+
+</html>
+
+

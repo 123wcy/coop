@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-待处理票据</title>
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <link rel='stylesheet' href="../css/wu/reset.css">
+    <!-- <link rel="stylesheet" href="./css/easyui.css"> -->
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../css/wu/b-income-ticket-waitDealInvoice.css" />
+    <link rel="stylesheet" href="../css/wu/common.css">
+    <link rel="stylesheet" href="../css/wu/b-common.css">
+    
+    <script src="../lib/vue.js"></script>
+    <script src="../lib/axios.js"></script>
+
+
+    <script src="../lib/browser.min.js"></script>
+    <script src="../lib/polyfill.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js"></script>
+    <script src="http://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+   
+   
+
+</head>
+
+<body>
+    <div id="app">
+
+        <!--&lt;!&ndash; 上 &ndash;&gt;-->
+        <!--<div class="nav-header">-->
+
+        <!--</div>-->
+
+        <div class="container">
+            <!--&lt;!&ndash; 左 &ndash;&gt;-->
+            <!--<div class="nav-left">-->
+                <!--<p><a href="./y_sales_review_list.html">销项票审核</a></p>-->
+                <!--<p><a href="../wu/b-income-ticket-examinelist.html">进项票审核</a></p>-->
+                <!--<p><a href="">待处理票据</a></p>-->
+                <!--<p><a href="../wu/b-income-ticket-waitenter.html">进项票录入</a></p>-->
+                <!--<p><a href="../wu/InvoiceManagementSalesmanQuery.html">发票查询</a></p>-->
+                <!--<p><a href="./InvoiceManagementCustomerInformation.html">客户资料</a></p>-->
+            <!--</div>-->
+
+            <!-- 右 -->
+            <div class="nav-right">
+
+                
+
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>待处理票据</span><span></span>
+                    </div>
+
+                    <div class="form-group flex-sb-center" style="width: 20%;margin-right: 20px;" v-cloak>
+                        <span  style="background: none;width: auto;text-align: right;">会员:</span>
+                        <select class="form-control" style="width: 80%" v-model="memberId" @change="changeType" id="change">
+                            <option v-for="option in options" :value="option.uid">
+                                {{ option.company_name }}
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div id="myCarousel" class="carousel slide carousel-box" data-wrap='false'>
+
+                    <div class="carousel-content clearfix">
+                        <a  class="fl left-btn" href="#myCarousel" role="button" data-slide="prev">
+                            <img src="../img/lunboz.png" class="left-img">
+                        </a>
+
+                        <div class="carousel-inner" v-cloak>
+                           <div :class="['item','clearfix',item.active ? 'active' : '']" v-for="(item, index) in statusList" :key="index" v-cloak>
+                                <div v-for="(dataItem, i) in item.dataList" :key="i" 
+                                    @click="statusClick(item,index,dataItem)" 
+                                    :class="[computedStatus(dataItem.status),dataItem.isClick ? 'item-clicked' : '']" v-cloak>
+
+                                    <div>{{dataItem.time}}</div>
+                                    <div>{{dataItem.status}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a class="fr right-btn" href="#myCarousel" role="button" data-slide="next">
+                            <img src="../img/lunboy.png">
+                        </a>
+                    </div>
+
+                </div> 
+
+
+                <div class="invoice-info-box flex-start-center" v-cloak>
+                   <div class="info-item flex-sb-center">
+                       <div class="title">入库总重量:</div>
+                       <div class="value">{{midValue.value1}}吨</div>
+                   </div>
+                   <div class="info-item flex-sb-center">
+                        <div class="title">已录进项票总重量:</div>
+                        <div class="value">{{midValue.value2}}吨</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">进项重量差额:</div>
+                        <div class="value">{{midValue.value3}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">应录进项票总额:</div>
+                        <div class="value">{{midValue.value4}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">已录进项票总额:</div>
+                        <div class="value">{{midValue.value5}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">进项票差额:</div>
+                        <div class="value">{{midValue.value6}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">应开销项票总重量:</div>
+                        <div class="value">{{midValue.value7}}吨</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">已开销项票总重量:</div>
+                        <div class="value">{{midValue.value8}}吨</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">销项重量差额:</div>
+                        <div class="value">{{midValue.value9}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">应开销项票总额:</div>
+                        <div class="value">{{midValue.value10}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">已开销项票总额:</div>
+                        <div class="value">{{midValue.value11}}元</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">销项票差额:</div>
+                        <div class="value">{{midValue.value12}}元</div>
+                    </div>
+
+                    <div class="info-item flex-sb-center">
+                        <div class="title">借票总重量:</div>
+                        <div class="value">{{midValue.value13}}吨</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">待审核补票总重量:</div>
+                        <div class="value">{{midValue.value14}}吨</div>
+                    </div>
+                    <div class="info-item flex-sb-center">
+                        <div class="title">待补票总重量:</div>
+                        <div class="value">{{midValue.value15}}吨</div>
+                    </div>
+                </div>
+             
+
+                <!-- table -->
+                <div class="table-box">
+                    <div class="btn-items">
+                        <div class="flex-sb-center" style="margin-bottom: 20px" >
+                            <div class="operator-btn" >
+                                <button class="o-btn submit-btn plr15"  :disabled="disabled" @click="invoiceInput">补票</button>
+                                <button class="o-btn submit-btn plr15" :disabled="disabled" @click="cuiInvoice">催票</button>
+
+                            </div>
+                         
+                            <div style="flex: 1;text-align: right">
+                                <button class="o-btn neworder-btn" type="button"  id="expor-table" @click="onexport"  style="margin-right: 0px">导出</button>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                </div>
+                <!-- table -->
+                <div class="table-box">
+                    <div class="table-content-box">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-th">
+                                        <th width="6%"><input type="checkbox" v-model="allcheckbox" @change="allCheck"></th>
+                                        <th>补票期限</th>
+                                        <th>采购合同编号</th>
+                                        <th>商品名称</th>
+                                        <th>规格</th>
+                                        <th>批号</th>                                        
+                                        <th>待补票重量（吨）</th>
+                                        <th>待审核补票重量（吨）</th>
+                                        <th>借票时间</th>
+                                        <th>采购商</th>
+                                        <th>原供货商</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if='goodsList.length==0'><td colspan='11'>没有找到匹配的记录</td></tr>
+                                    <tr v-for="(item, index) in goodsList" :key="index" v-cloak>
+                                        <td>
+                                           <input type="checkbox" v-model="item.checked" @change="singleCheck(item)">
+                                        </td>
+                                        <td>{{item.supplyTerm}}</td>
+                                        <td>{{item.contractNumber}}</td>
+                                        <td>{{item.goodsName}}</td>
+                                        <td>{{item.goodsSpec}}</td>
+                                        <td>{{item.batch}}</td>
+                                        <td>{{item.BpWeight}}</td>
+                                        <td>{{item.pendingBpWeight}}</td>
+                                        <td>{{item.replaceDate}}</td>
+                                        <td>{{item.cgSupply}}</td>
+                                        <td>{{item.ghSupply}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div v-show="false" class="table-content-box">
+                        <div>
+                            <table class="table table-bordered" id="out-table">
+                                <thead>
+                                    <tr class="table-th">
+                                        <th width="6%"><input type="checkbox" v-model="allcheckbox" @change="allCheck"></th>
+                                        <th>采购合同编号</th>
+                                        <th>商品名称</th>
+                                        <th>批号</th>
+                                        <th>规格</th>
+                                        <th>待录票重量(吨)</th>
+                                        <th>入库单价(元/吨)</th>
+                                        <th>已录进项票重量</th>
+                                        <th>已开销项票重量</th>
+                                        <th>供应商</th>
+                                        <th>仓库</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item, index) in checkedItem" :key="index" v-cloak>
+                                        <td>
+                                           <input type="checkbox" v-model="item.checked" @change="singleCheck(item)">
+                                        </td>
+                                        <td>{{item.contractNumber}}</td>
+                                        <td>{{item.name}}</td>
+                                        <td>{{item.batch}}</td>
+                                        <td>{{item.spec}}</td>
+                                        <td>{{item.outweight}}</td>
+                                        <td>{{item.price}}</td>
+                                        <td>{{item.inweight}}</td>
+                                        <td>{{item.outputCount}}</td>
+                                        <td>{{item.supply}}</td>
+                                        <td>{{item.warehouse}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- 分页 -->
+                <div id="pagination" class="easyui-panel">
+                    <div class="easyui-pagination"></div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <!-- 弹出框  -->
+        <div>
+            <div class="modal fade cui-modal" id="cuiModal" tabindex="-1" role="dialog" aria-labelledby="cuiModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="cuiModalLabel">
+                                确认催票联系人
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            
+
+                            <div class="cui-modal-input" id='CusForm'> 
+                                <div class="flex-sb-center form-item">
+                                    <span class="label-item">*单位名称：</span>
+                                    <span class="form-control company-name" disabled>{{rushInvoiceInfo.memberName}}</span>
+                                </div>
+                                <div class="form-group flex-sb-center form-item">
+                                    <span class="label-item">联系人:</span>
+                                    <input type="text" class="form-control" v-model="rushInvoiceInfo.connector">
+                                </div>
+
+                                <div class="form-group flex-sb-center form-item">
+                                    <span class="label-item">联系人手机:</span>
+                                    <input type="tel" class="form-control" v-model="rushInvoiceInfo.connectPhone" @blur="phoneBlur">
+                                    <span class="connect-phone" v-if="isShowPhoneTip">手机号码有误，请重填</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                            </button>
+                            <button type="button" class="btn" @click="contactClick">
+                                确定
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade cui-modal" id="notCuiModal" tabindex="-1" role="dialog" aria-labelledby="cuiModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                催票时供货商必须相同！
+                            </div>
+                            <div class="modal-footer">
+                               
+                                <button type="button" class="btn" data-dismiss="modal">
+                                    确定
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <script src="../lib/jquery.easyui.min.js"></script>
+    <script src="../js/wu/qs.js"></script>
+    <script src="../js/wu/utils.js"></script>
+    <script src="../js/wu/b-income-ticket-waitDealInvoice.js"></script>
+    <script src="../lib/elementui/index.js"></script>
+    
+    
+    <script>
+        $('#myCarousel').carousel('pause')
+
+
+       
+    </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-进项票录票记录</title>
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/wu/reset.css">
+    <link rel="stylesheet" href="../css/wu/common.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/layui.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/modules/laydate/default/laydate.css">
+
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/jquery-easyui-1.6.10/themes/icon.css">
+    <link rel="stylesheet" href="../css/wu/income-ticket-enterrecord.css">
+    <script src="../lib/vue.js"></script>
+    <script src="../lib/browser.min.js"></script>
+    <script src="../lib/polyfill.min.js"></script>
+    <script src="../lib/axios.js"></script>
+    <script src="../lib/layui-master/dist/layui.js"  charset="utf-8"></script>
+
+
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+    
+</head>
+
+<body>
+    <div class="enter-record" id="app">
+        <!--&lt;!&ndash; 上 &ndash;&gt;-->
+        <!--<div class="nav-header">-->
+
+        <!--</div>-->
+
+        <div class="container">
+            <!--&lt;!&ndash; 左 &ndash;&gt;-->
+            <!--<div class="nav-left">-->
+                <!--<p><a href="../Member/Sales_ticket_list.html">销项票申请</a></p>-->
+                <!--<p><a href="./income-ticket-waitenter.html">进项票录入</a></p>-->
+                <!--<p><a href="./income-ticket-waitDealInvoice.html">待处理票据</a></p>-->
+                <!--<p><a href="./InvoiceManagementBillInquiry.html">发票查询</a></p>-->
+                <!--<p><a href="../Member/InvoiceManagementCustomerInformation.html">客户资料</a></p>-->
+            <!--</div>-->
+
+            <!-- 右 -->
+            <div class="nav-right">
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>进项票录票记录</span><span></span>
+                    </div>
+                    <div class="operator-btn">
+                        <button class="o-btn back-btn" @click="back">返回</button>
+                    </div>
+                </div>
+
+                <div class="form-box">
+                    <form role="form" class="flex-start-center">
+                        <div class="form-group flex-end-center form-item" style="width: 49%;margin-right: 1%;">
+                            <span class="label-item">录入时间:</span>
+                            <input type="text" id="startTime" class="form-control" style="width: 37%;margin-right: 10px;" autocomplete="off"
+                                   v-model='searchList.applyDateStart'>
+                            <span>至</span>
+                            <input type="text"  id="endTime" class="form-control" style="width:38%" autocomplete="off"
+                                   v-model='searchList.applyDateEnd'>
+                        </div>
+                        <div class="form-group flex-start-center-nowrap form-item" style="width: 50%">
+                            <span class="label-item">开票时间:</span>
+                            <input type="text" id="startTimel" class="form-control" style="width: 41%;margin-right:10px" autocomplete="off"
+                                   v-model='searchList.billCreateDateStart'>
+                            <span>至</span>
+                            <input type="text"  id="endTimel"  class="form-control" style="width: 40%" autocomplete="off"
+                                   v-model='searchList.billCreateDateEnd'>
+                        </div>
+
+                        <div class="form-group flex-start-center-nowrap form-item" style="width: 33%;">
+                            <span class="label-item">发票状态:</span>
+                            <select class="form-control" v-model='searchList.billStatus'>
+                                <option value="">全部</option>
+                                <option value="1">已保存</option>
+                                <option value="2">待审核</option>
+                                <option value="3">已撤销</option>
+                                <option value="4">已通过</option>
+                                <option value="5">未通过</option>
+                                <option value="6">待作废</option>
+                                <option value="7">已作废</option>
+                                <option value="8">未作废</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group flex-start-center-nowrap form-item" style="width: 33%;margin-left: 1%;margin-right: 1%;">
+                            <span class="label-item">发票类型:</span>
+                            <select class="form-control" v-model='searchList.billPaperType'>
+                                <option value="">全部</option>
+                                <option value="1">增值税专用发票</option>
+                                <option value="2">普通发票</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-start-center-nowrap form-item">
+                            <span class="label-item">来票单位:</span>
+                            <input type="text" class="form-control" v-model='searchList.inCompany'>
+                        </div>
+                        <div class="form-group flex-start-center-nowrap form-item" style="width: 33%;">
+                            <span class="label-item">发票编号:</span>
+                            <input type="text" class="form-control" v-model='searchList.billCode'>
+                        </div>
+                        <div class="form-group search-btn form-item ps-btn" style="text-align: right">
+                            <button class="o-btn submit-btn mr12" @click.prevent="resetBtn">重置</button>
+                            <button class="o-btn submit-btn mr12" @click.prevent='searchBtn'>查询</button>
+                            <button class="o-btn mr0 neworder-btn" @click.prevent='onexport' style="margin-right: 0">导出</button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <!-- table -->
+                <div class="table-box">
+                    <div class="table-content-box">
+                        <div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="table-th">
+                                        <th width="6%"><input type="checkbox" v-model="allcheckbox" @change="allCheck"></th>
+                                        <th>操作</th>
+                                        <th>录票时间</th>
+                                        <th>状态</th>
+                                        <th>来票单位</th>
+                                        <th>发票编号</th>
+                                        <th>开票时间</th>
+                                        <th>发票金额</th>
+                                        <th>发票类型</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-if='enterrecordList.length==0'><td colspan='9'>没有找到匹配的记录</td></tr>
+                                    <tr v-for="(item, index) in enterrecordList" :key="index" v-cloak>
+                                        <td>
+                                            <input type="checkbox" v-model="item.checked" @change="singleCheck(item)">
+                                        </td>
+                                        <td>
+                                            <span v-for="(val,i) in item.btnlist" :key="i">
+                                                <a @click=val.fun(item) style="cursor: pointer;" v-if="val.text!='删除'&&val.text!='申请作废'&&val.text!='撤销'">{{val.text}}</a>&nbsp;
+                                                <a data-toggle="modal" data-target="#delModal" @click=val.fun(item) style="cursor: pointer;" v-if="val.text=='删除'">{{val.text}}</a>&nbsp;
+                                                <a data-toggle="modal" data-target="#voidModal" @click=val.fun(item) style="cursor: pointer;" v-if="val.text=='申请作废'">{{val.text}}</a>&nbsp;
+                                                <a data-toggle="modal" data-target="#cancelModal" @click=val.fun(item) style="cursor: pointer;" v-if="val.text=='撤销'">{{val.text}}</a>&nbsp;
+                                            </span>
+                                        </td>
+                                        <td>{{item.applyDate}}</td>
+                                        <td>{{item.billStatus}}</td>
+                                        <td>{{item.inCompany}}</td>
+                                        <td>{{item.billCode}}</td>
+                                        <td>{{item.billCreateDate}}</td>
+                                        <td>{{item.billTotalAccount}}</td>
+                                        <td>{{item.billPaperType}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div id="pagination" class="easyui-panel">
+                    <div class="easyui-pagination"></div>
+                </div>
+            </div>
+            
+    
+        </div>
+        <!-- 删除弹窗 -->
+        <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            删除确认
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        你确定要删除进项票<span style="color: #ff0000;">{{delItem.billCode}}</span>吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn neworder-btn" @click='toDetail(delItem)'>
+                            查看详情
+                        </button>
+
+                        <button type="button" class="btn back-btn" @click='del'>
+                            确定删除
+                        </button>
+
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 撤销弹窗 -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            撤销确认
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        你确定要撤销进项票<span style="color: #ff0000;">{{delItem.billCode}}</span>吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn neworder-btn" @click='toDetail(delItem)'>
+                            查看详情
+                        </button>
+
+                        <button type="button" class="btn back-btn" @click='cancel'>
+                            确定撤销
+                        </button>
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 申请作废弹窗 -->
+        <div class="modal fade" id="voidModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            申请作废
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2">发票信息</td>
+                                    <td>申请作废原因</td>
+                                </tr>
+                                <tr>
+                                    <td width='15%' class="text-r">发票编号</td>
+                                    <td width='25%' class="text-l">{{voidItem.billCode}}</td>
+                                    <td rowspan="7">
+                                        <textarea name="" cols="" rows="7" placeholder="请填写申请作废发票的原因，此项为必填项！" v-model='reason'></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">发票金额</td>
+                                    <td class="text-l">{{voidItem.billTotalAccount | moneyFilter}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">发票类型</td>
+                                    <td class="text-l">{{voidItem.billPaperType}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">税率</td>
+                                    <td class="text-l">{{voidItem.taxRate | taxRateFilter}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">来票单位：</td>
+                                    <td class="text-l">{{voidItem.inCompany}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">开票时间</td>
+                                    <td class="text-l">{{voidItem.billCreateDate}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-r">录票时间</td>
+                                    <td class="text-l">{{voidItem.applyDate}}</td>
+                                </tr>
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn neworder-btn" @click='toDetail(voidItem)'>
+                            查看详情
+                        </button>
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                        <button type="button" class="btn" @click='void1'>
+                            提交申请
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/wang/filters.js"></script>
+    <script src="../lib/jquery.easyui.min.js"></script>
+    <script src="../js/wu/qs.js"></script>
+    <script src="../js/wu/utils.js"></script>
+    <script src="../js/wu/income-ticket-enterrecord.js"></script>
+    <script src="../lib/elementui/index.js"></script>
+   
+</body>
+
+</html>
+

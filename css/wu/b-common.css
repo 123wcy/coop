@@ -1,0 +1,34 @@
+
+.table-box .table-title {
+    color: #fff;
+    text-align: center;
+    background: #5987cf;
+    height: 38px;
+    line-height: 38px;
+}
+.table-th {
+background: #5987cf;
+color: #fff;
+}
+
+.tab-btn span:nth-child(1) {
+background: #5987cf;
+}
+
+.tab-btn span:nth-child(2) {
+color: #5987cf;
+border-color: #5987cf;
+}
+
+.tab-btn span:nth-child(3) {
+background: #5987cf;
+}
+
+.submit-btn, .save-btn {
+    background-color: #5987cf;
+    border-radius: 4px;
+}
+.submit-btn, .save-btn:hover {
+    background-color: #68b1e3;
+    border-radius: 4px;
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-进项票录入</title>
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/wu/reset.css">
+    <link rel="stylesheet" href="../css/wu/common.css">
+    <link rel="stylesheet" href="../css/wu/b-common.css">
+    <link rel="stylesheet" href="../lib/layui-master/dist/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="../lib/layui-master/dist/css/modules/laydate/default/laydate.css">
+    <link rel="stylesheet" type="text/css" href="../css/wu/b-income-ticket-entering.css" />
+    <script src="../lib/vue.js"></script>
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.2.5/polyfill.js"></script>
+    <script src="../lib/axios.js"></script>
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+
+    <link rel="stylesheet" href="../lib/bootstrapvalidator-master/dist/css/bootstrapValidator.min.css">
+    <script src="../lib/bootstrapvalidator-master/dist/js/bootstrapValidator.min.js"></script>
+    <script src="../lib/layui-master/dist/layui.js"  charset="utf-8"></script>
+
+
+    <style>
+        .operator-btn1 {
+            position: absolute;
+            top: -72px;
+            right: 0;
+            margin-top: 20px;
+        }
+    </style>
+        
+</head>
+
+<body>
+    <div id="app">
+        <!--&lt;!&ndash; 上 &ndash;&gt;-->
+        <!--<div class="nav-header">-->
+        <!---->
+        <!--</div>-->
+        <!-- <button-counter></button-counter> -->
+        <div class="container">
+            <!-- 左 -->
+            <!--<div class="nav-left">-->
+                <!--<p><a href="../Salesman/y_sales_review_list.html">销项票审核</a></p>-->
+                <!--<p><a href="./b-income-ticket-examinelist.html">进项票审核</a></p>-->
+                <!--<p><a href="../Salesman/b-income-ticket-waitDealInvoice.html">待处理票据</a></p>-->
+                <!--<p><a href="./b-income-ticket-waitenter.html">进项票录入</a></p>-->
+                <!--<p><a href="./InvoiceManagementSalesmanQuery.html">发票查询</a></p>-->
+                <!--<p><a href="../Salesman/InvoiceManagementCustomerInformation.html">客户资料</a></p>-->
+            <!--</div>-->
+
+            <!-- 右 -->
+            <div class="nav-right">
+                <div class="flex-sb-center">
+                    <div class="tab-btn">
+                        <span></span><span>进项票录入</span><span></span>
+                    </div>
+                </div>
+
+                <div class="form-box">
+                    <form role="form" method="POST" class="flex-start-center">
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">委托会员:</span>
+                            <input type="text" class="form-control" v-model="enteringList.memberName" name="memberName" disabled>
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item percent">
+                            <span class="label-item">来票单位:</span>
+                            <input type="text" class="form-control" v-model="enteringList.inCompany" name="inCompany" disabled>
+                            <!--<em><a style="cursor: pointer;" href="../Salesman/InvoiceManagementCustomerInformation.html?from=Salentering">修改</a></em>-->
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">发票总额:</span>
+                            <input type="text" class="form-control" id="billTotalAccount" disabled v-model="enteringList.billTotalAccount" name="billTotalAccount">
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">开票时间:</span>
+                            <input type="text" id="startTime" class="form-control" autocomplete="off"
+                                   v-model="enteringList.billCreateDate"
+                                   name="billCreateDate" readonly="readonly">
+                        </div>
+
+
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">发票类型:</span>
+                            <select class="form-control" v-model="enteringList.billPaperType" name="billPaperType">
+                                <option value="1">增值税专用发票</option>
+                                <option value="2">普通发票</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group flex-end-center form-item percent">
+                            <span class="label-item">税率:</span>                            
+                            <input type="text" class="form-control" v-model="enteringList.taxRate" name="taxRate">
+                            <em>%</em>
+                        </div>
+
+
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">发票编号:</span>
+                            <input type="text" class="form-control" v-model="enteringList.billCode" name="billCode">
+                        </div>
+
+
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">开户银行:</span>
+                            <input type="text" class="form-control" v-model="enteringList.openBank" name="openBank">
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item" style="position: relative;">
+                            <span class="label-item">银行账号:</span>
+                            <input type="text" class="form-control" v-model="enteringList.openAccount" name="openAccount">
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">来票地址:</span>
+                            <input type="text" class="form-control" v-model="enteringList.lpAddress" name="lpAddress">
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item">
+                            <span class="label-item">联系电话:</span>
+                            <input type="text" class="form-control" type="number" v-model="enteringList.phone" name="phone">
+                        </div>
+
+                        <div class="form-group flex-sb-center form-item" style="position: relative;">
+                            <span class="label-item">纳税人识别号:</span>
+                            <!-- <input type="text" class="form-control" v-model="enteringList.taxpayerCode" name="taxpayerCode"> -->
+                            <input type="text" class="form-control" v-model="enteringList.taxpayerCode">
+                        </div>
+                        
+
+
+                        <div class="operator-btn1" v-cloak>
+                            <button  class="o-btn b-defalut-btn" @click.stop="submit(1)">提交</button>
+                            <button class="o-btn save-btn" v-if="billStatus!=2" @click.prevent='submit(2)'>保存</button>
+                            <button class="o-btn back-btn" @click.prevent="back">返回</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- table -->
+                <div class="table-box">
+                    <div class="btn-items">
+                        <div class="flex-sb-center">
+                            <div class="operator-btn" v-cloak>
+                                <button class="o-btn neworder-btn plr15" @click="addClick">新增商品</button>
+                                <button class="o-btn neworder-btn plr15" v-if="hideBtn" @click="batchInvoice">批量录入发票</button>
+                            </div>
+                            <div style="width: 30%">
+                                <div class="form-group flex-sb-center">
+                                    <span class="label-item">应录进项票总额:</span>
+                                    <input type="text" class="form-control" disabled v-model="incomeMoney">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="width: 100%; overflow: auto;">
+                        <div>
+                            <div class="table-content-box flex-sb-center-nowrap">
+                                <div>
+                                    <div class="table-title">合同商品信息</div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="32px">操作</th>
+                                                <th width="">采购合同编号</th>
+                                                <th>商品名称</th>
+                                                <th>批号</th>
+                                                <th>规格</th>
+                                                <th>待录票重量</th>
+                                                <th>入库单价</th> 
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr v-for="(item, index) in IncomeBill_detailList" :key="index"  v-cloak>
+                                                <td><a @click="delItem(item)"><span class="glyphicon glyphicon-remove"></span></td>
+                                                <td>{{item.contractNumber}}</td>
+                                                <td>{{item.name}}</td>
+                                                <td>{{item.batch}}</td>
+                                                <td>{{item.spec}}</td>
+                                                <td>{{item.outweight}}</td>
+                                                <td>{{item.price}}</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="width: 32%">
+                                    <div class="table-title">发票明细信息</div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <!-- <th width="20%">单价(元/吨)</th> -->
+                                                <th width="34%">票面商品重量(吨)</th>
+                                                <th width="35%">商品金额(元)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        
+                                            
+
+                                            <tr v-for="(item, index) in IncomeBill_detailList" :key="index" class="input-box" v-cloak>
+                                                <!-- <td>{{item.price}}</td> -->
+                                                <td><input type="text" class="form-control" placeholder="请输入" v-model="item.billWeight"
+                                                        @input="productMoneyFun(item)" @blur="toDecimal(index)"></td>
+                                                <td><input type="text" class="form-control" placeholder="自动计算" v-model="item.billMoney" @blur="toDecimal(item.billMoney)" disabled></td>
+                                                <!-- <td><a @click="delItem(item)"><span class="glyphicon glyphicon-remove"></span></td> -->
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/wu/qs.js"></script>
+    <script src="../js/wu/utils.js"></script>  
+    <script src="../lib/elementui/index.js"></script>                
+    <script src="../js/wu/b-income-ticket-entering.js"></script>
+
+    <script>
+       $(function(){
+            validator()
+       })
+    </script>
+</body>
+
+</html>

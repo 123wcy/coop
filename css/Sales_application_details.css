@@ -1,0 +1,13 @@
+.table{
+	height: 110px;
+}
+.taxRate{
+	position: relative;
+}
+.taxRate .percentage{
+	position: absolute;
+	right:10px;
+}
+.table>thead > tr > th{
+	padding: 5px;
+}

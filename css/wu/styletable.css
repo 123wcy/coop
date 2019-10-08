@@ -1,0 +1,56 @@
+#edit_modal {
+  margin: auto;
+  min-width: 479px;
+  min-height: 479px;
+}
+.modal-title{
+  font-size: 18px;
+}
+#edit_modal #contain > div {
+  margin: 15px;
+}
+#edit_modal #contain > div label {
+  text-align: right;
+}
+#edit_modal #contain > div > div {
+  padding-right: 0px;
+}
+#edit_modal #padding0 > div {
+  padding: 0px;
+}
+#edit_modal #containl > div {
+  margin: 15px;
+}
+#edit_modal #containl > div label {
+  text-align: right;
+}
+#edit_modal #containl > div > div {
+  padding-right: 0px;
+}
+#edit_modal #padding > div {
+  padding: 0px;
+}
+.modal-footer button:first-child {
+  float: left;
+}
+.modal-footer button:last-child {
+  float: right;
+}
+
+#recordPopover_modal {
+  margin: auto;
+  min-width: 479px;
+  min-height: 479px;
+}
+#recordPopover_modal #contain > div {
+  margin: 15px;
+}
+#recordPopover_modal #contain > div label {
+  text-align: right;
+}
+#recordPopover_modal #contain > div > div {
+  padding-right: 0px;
+}
+#recordPopover_modal #padding0 > div {
+  padding: 0px;
+}

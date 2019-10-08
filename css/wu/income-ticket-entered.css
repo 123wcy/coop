@@ -1,0 +1,43 @@
+
+.form-opration {
+  text-align: right;
+  margin-bottom: 20px;
+}
+.form-item{
+  width: 31%;
+  margin-bottom: 20px;
+}
+.btn-items {
+  margin-bottom: 20px;
+}
+
+.table-box .table{
+  margin-bottom: 0;
+}
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+.pagination td,.pagination  th{
+  height: 0;
+}
+
+.modal-title {
+  text-align: center;
+}
+
+#myModal  .modal-dialog {
+  width: 80%;
+}
+#uploadModal .modal-body{
+  height: auto;
+}
+#uploadModal .row {
+  margin-left: 12px
+}

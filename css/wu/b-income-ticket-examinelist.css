@@ -1,0 +1,146 @@
+.tab-btn span:nth-child(1) {
+  background: #5987cf;
+}
+
+.tab-btn span:nth-child(2) {
+  color: #5987cf;
+  border-color: #5987cf;
+}
+
+.tab-btn span:nth-child(3) {
+  background: #5987cf;
+}
+.table-box .table-th{
+  background: #5987cf;
+}
+
+/* 分页 */
+.panel-htop {
+  width: 95%;
+  margin: 0 auto;
+}
+.pagination {
+  display: block;
+  margin: 0;
+  width: auto !important;
+}
+.pagination td,.pagination  th{
+  height: 0;
+}
+.table-box .table{
+  margin-bottom: 0;
+}
+
+
+
+
+.modal {
+    /* top: 20%; */
+}
+.modal .modal-header {
+    background: #5987cf;
+    height: 60px;
+    line-height: 60px;
+    font-family: MicrosoftYaHei;
+    font-size: 18px;
+    font-weight: normal;
+    color: #fff;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.modal .modal-title {
+
+}
+.modal-header .close {
+    color: #fff;
+    opacity: inherit;
+    margin-top: auto;
+}
+.modal .btn-business {
+    height: 31px;
+    line-height: 31px;
+	background-color: #5987cf;
+	border-radius: 4px;
+    border: solid 1px #2e6da4;
+    font-family: MicrosoftYaHeiLight;
+    font-size: 12px;
+    color: #fff;
+    padding: 0 23px;
+}
+.modal-body div{
+    color: #3d3d3d;
+    font-size: 12px;
+}
+.modal-body .header>div {
+    flex:1;
+    text-align: center;
+    border: 1px solid #ccc;
+    height: 37px;
+    line-height: 37px;  
+}
+.modal-body .header>div:nth-child(1) {
+    border-right: none;
+}
+
+.modal-body .content>div{
+    flex: 1;
+}
+.modal-body .content>div:nth-child(1){
+    margin-right: 1px;
+}
+
+.modal-body .content .item>div {
+
+    /* flex: 1; */
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    height: 37px;
+    line-height: 37px;  
+    text-align: center;
+    margin-right:-1px;
+    width: 140px;
+    /*overflow: auto;*/
+}
+.modal-body .content .item>div:nth-child(1){
+    width: 100px
+}
+.modal-body .content .item>div:nth-child(2){
+    width: 183px
+}
+.modal-body .content .item>div:nth-child(1) {
+    border-right: none;
+}
+
+.modal-body .right .header{
+    text-align: center;
+}
+.modal-body .right .con {
+    margin-left: 1px;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-body .right .con textarea{
+    width: 100%;
+    text-indent: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
+    height: 125px;    
+    resize: none;
+}
+.modal-body .right .header{
+    height: 37px;
+    line-height: 37px;  
+    text-align: center;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-body .right .con3 textarea {
+    height: 291px;
+}
+.nav-right .back-btn {
+    margin-right: 0px;
+}
+

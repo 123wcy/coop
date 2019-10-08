@@ -1,0 +1,142 @@
+.carousel-box {
+    height: 95px;
+    margin: 20px 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+.carousel-inner {
+    /* margin-left: 48px; */
+    width: 1030px;
+    margin: 0 auto;
+    /* height: 72px; */
+}
+.carousel-inner .item>div {
+    width: 72px;
+    height: 72px;
+    float: left;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    background: #43a16c;
+    cursor: pointer;
+}
+.carousel-inner .item>div:not(:last-child){
+    margin-right: 15px;
+}
+.carousel-inner .item>div>div:nth-child(1){
+    margin-top: 20px;
+}
+.carousel-inner .item .not-wait-off {
+    background: #fff ;
+    color: #3d3d3d;
+    border: solid 1px #43a16c;
+}
+.carousel-inner .item .item-clicked {
+    background: #fff ;
+    color: #3d3d3d;
+    border: solid 2px red;
+    color: red;
+}
+.carousel-inner .item .not-allowed{
+    color: #555;
+    background: #eee;
+    cursor: not-allowed;
+}
+
+
+
+.carousel-content {
+    position: relative;
+}
+.carousel-content .left-btn {
+    position: absolute;
+    left: 10px;
+    top: 7px;
+}
+.carousel-content .right-btn {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+}
+
+
+/* form-box */
+.invoice-info-box {
+    padding: 0 40px;
+}
+.invoice-info-box .info-item {
+    margin-right: 50px;
+    font-size: 12px;
+    color: #3d3d3d;
+    font-family: MicrosoftYaHeiLight;
+    margin-bottom: 20px;
+
+}
+.invoice-info-box .info-item .title{
+    width: 200px;
+    text-align: right;
+    margin-right: 50px;
+}   
+.invoice-info-box .info-item .value{
+    width: 95px;
+    text-overflow : ellipsis; 
+}
+
+
+
+
+
+
+
+
+
+
+
+  /* 模态框 */
+  .modal {
+      top:30%;
+      
+      font-family: MicrosoftYaHei;
+	  font-weight: normal;
+	  font-stretch: normal;
+	  letter-spacing: 0.4px;
+      font-size: 18px;
+      border-radius: 10px;
+      box-shadow: 0px 5px 8px 0px 
+		rgba(0, 0, 0, 0.75);
+  }
+
+  .cui-modal .cui-modal-input {
+      margin-top: 20px;
+  }
+  .cui-modal .cui-modal-input .label-item{
+      font-size: 12px;
+      color: #3d3d3d;
+  }
+  .cui-modal .cui-modal-input .form-item{
+      margin-bottom: 26px;
+  }
+  .cui-modal .cui-modal-input .company-name {
+    width: 74%;
+    margin-left: 0;
+  }
+  .cui-modal .cui-modal-input .connect-phone {
+    font-size: 12px;
+    color: red;
+    width: 74%;
+    display: block;    
+    margin-left: 26%;
+  } 
+  .cui-modal .form-item{
+      width: 90%;
+  }
+  .modal-header {
+    height: 60px;
+    line-height: 60px;
+    color: #fff;
+	background-color: #42a26b;
+  }
+  .cui-modal .modal-footer .btn{
+      color: #fff;
+	background-color: #42a26b;      
+  }

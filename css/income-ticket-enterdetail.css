@@ -1,0 +1,6 @@
+.table-box div:nth-child(2) {
+  flex: 1
+}
+.table-box div:nth-child(1){
+  flex: 4;
+}

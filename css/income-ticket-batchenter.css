@@ -1,0 +1,25 @@
+tr>td {
+    text-align: center;
+}
+.table-title div{
+    color: #fff;
+    text-align: center;
+    background: #43a16c;
+    height: 38px;
+    line-height: 38px;
+}
+.table-title div:nth-child(1){
+    width:62.6%;
+    border-right: 1px solid #b3b3b3;
+}
+.table-title div:nth-child(2){
+    width: 37.4%;
+}
+
+.btn-items{
+    margin-bottom: 24px;
+}
+.goods-table tbody td {
+    height: 50px;
+    line-height: 50px;
+}

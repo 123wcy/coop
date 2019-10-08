@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中实交易-进项票审核详情</title>
+    <script src="../lib/jquery.1.11.3.min.js"></script>
+    <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel='stylesheet' href="../css/wu/reset.css">
+    <link rel="stylesheet" href="../css/wu/common.css">
+    <link rel="stylesheet" type="text/css" href="../css/wu/b-income-ticket-examinedetail.css" />
+    <script src="../lib/vue.js"></script>
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.2.5/polyfill.js"></script>
+    <script src="../lib/axios.js"></script>
+
+
+    <link rel="stylesheet" href="../lib/elementui/theme-chalk/index.css">
+    <script src="../lib/elementui/index.js"></script>
+
+    <link rel="stylesheet" href="../lib/bootstrapvalidator-master/dist/css/bootstrapValidator.min.css">
+    <script src="../lib/bootstrapvalidator-master/dist/js/bootstrapValidator.min.js"></script>
+
+    <style>
+        #detailModal table thead{
+            background-color: #5987cf;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <!--&lt;!&ndash; 上 &ndash;&gt;-->
+    <!--<div class="nav-header">-->
+
+    <!--</div>-->
+
+    <div class="container">
+        <!--&lt;!&ndash; 左 &ndash;&gt;-->
+        <!--<div class="nav-left">-->
+            <!--<p><a href="./b-income-ticket-examinelist.html">进项票审核列表</a></p>-->
+            <!--<p><a href="./b-income-ticket-examinedetail.html">进项票审核详情</a></p>-->
+            <!--<p><a href="./b-income-ticket-waitenter.html">进项票待录入列表</a></p>-->
+            <!--<p><a href="./b-income-ticket-enterrecord.html">进项票录票记录</a></p>-->
+            <!--<p><a href="./b-income-ticket-enterdetail.html">进项票详情</a></p>-->
+            <!--<p><a href="./b-income-ticket-invoicedetail-in.html">发票详情-进项</a></p>-->
+        <!--</div>-->
+
+        <!-- 右 -->
+        <div class="nav-right">
+            <div class="flex-sb-center">
+                <div class="tab-btn">
+                    <span></span><span>进项票审核详情</span><span></span>
+                </div>
+                <div class="operator-btn" v-cloak>
+
+                    <button class="o-btn b-defalut-btn" v-show="['1','2'].indexOf(IncomeBill.billStatus) !== - 1" @click="editClick">
+                        编辑
+                    </button>
+                    <button class="o-btn b-defalut-btn" v-show="['6'].indexOf(IncomeBill.billStatus) !== - 1"  @click.prevent="voidClick" data-toggle="modal" data-target="#voidModal">
+                        作废
+                    </button>
+                    <button class="o-btn b-defalut-btn" v-show="['6'].indexOf(IncomeBill.billStatus) !== - 1"  @click.prevent="voidClick" data-toggle="modal" data-target="#voidModal">
+                        不作废
+                    </button>
+                    <button class="o-btn b-defalut-btn" v-show="['4','8'].indexOf(IncomeBill.billStatus) !== - 1"  data-toggle="modal" data-target="#voidModall">
+                        作废
+                    </button>
+                    <button class="o-btn b-defalut-btn" v-show="['2'].indexOf(IncomeBill.billStatus) !== - 1"  data-toggle="modal" data-target="#adoptModal">
+                        通过
+                    </button>
+                    <button class="o-btn b-defalut-btn" v-show="['2'].indexOf(IncomeBill.billStatus) !== - 1" data-toggle="modal" data-target="#adoptModal">
+                        未通过
+                    </button>
+                    <button class="o-btn b-warning-btn" v-show="['1','2','3','4','5','6','7','8'].indexOf(IncomeBill.billStatus) !== - 1" @click="goBack">
+                        返回
+                    </button>
+                </div>
+            </div>
+            <div class="form-group flex-sb-center form-item entrustor">
+                <span class="label-item">委托会员:</span>
+                <input type="text" class="form-control" v-model="member.memberName" disabled>
+            </div>
+            <div class="detail-desc" v-cloak>
+                <p class="detail-icon fl" v-if='Income_hisList.length'></p>
+                <p :class="['detail-item',item.isRed?'red-text':'']" v-for="(item, index) in Income_hisList" :key="index">
+                    <span>{{item.updatedate}}</span>&nbsp;&nbsp;&nbsp;
+                    <span>{{item.billType}}</span>&nbsp;&nbsp;&nbsp;
+                    <span>{{item.updatereason}}</span>
+                </p>
+            </div>
+            <div class="form-box">
+                <form role="form" class="flex-start-center">
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">来票单位:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.inCompany">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">发票类型:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.billPaperType">
+                    </div>
+                    <div class="form-group flex-sb-center form-item percent">
+                        <span class="label-item">税率:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.taxRate">
+                        <em>%</em>
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">开票时间:</span>
+                        <input type="date" class="form-control" disabled v-model="IncomeBill.billCreateDate">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">发票编号:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.billCode">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">发票总额:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.billTotalAccount">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">开户银行:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.openBank">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">银行账号:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.openAccount">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">纳税人识别号:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.taxpayerCode">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">来票地址:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.lpAddress">
+                    </div>
+                    <div class="form-group flex-sb-center form-item">
+                        <span class="label-item">联系电话:</span>
+                        <input type="text" class="form-control" disabled v-model="IncomeBill.phone">
+                    </div>
+
+                </form>
+            </div>
+            <!-- table -->
+            <div class="table-box">
+
+                <!-- <div class="btn-items">
+                    <div class="flex-sb-center">
+                        <div class="operator-btn">
+                        </div>
+                        <div style="width: 40%">
+                            <div class="form-group flex-sb-center">
+                                <span class="label-item">应开进项票据总额:</span>
+                                <input type="text" class="form-control" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+
+                <div class="table-content-box flex-sb-center-nowrap">
+                    <div>
+                        <div class="table-title">合同商品信息</div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="8%">序号</th>
+                                <th>采购合同编号</th>
+                                <th>商品名称</th>
+                                <th>批号</th>
+                                <th>规格</th>
+                                <th>待录票重量</th>
+                                <th>入库单价</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr v-for="(item, index) in IncomeBill_detailList" :key="index">
+                                <th>{{index+1}}</th>
+                                <td>{{item.contractNumber}}</td>
+                                <td data-toggle="modal" data-target="#detailModal" style="cursor: pointer;" @click='toDetail(item)'>{{item.name}}</td>
+                                <td>{{item.batch}}</td>
+                                <td>{{item.spec}}</td>
+                                <td>{{item.outweight}}</td>
+                                <td>{{item.price}}</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="width: 32%;">
+                        <div class="table-title">发票明细信息</div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>重量</th>
+                                <th>金额</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(item, index) in IncomeBill_detailList" :key="index">
+                                <td>{{item.billWeight}}</td>
+                                <td>{{item.billMoney}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!--作废审核-->
+    <div class="modal fade" id="voidModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        作废审核
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="flex-sb-center header">
+                        <div>发票信息</div>
+                        <div>申请原因</div>
+                    </div>
+
+                    <div class="flex-sb-center content">
+                        <div>
+                            <div class="flex-sb-center item">
+                                <div>委托会员</div>
+                                <div>{{member.memberName}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票编号</div>
+                                <div>{{IncomeBill.billCode}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票金额</div>
+                                <div>{{IncomeBill.billTotalAccount | moneyFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票类型</div>
+                                <div>{{IncomeBill.billPaperType}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>税率</div> 
+                                <div>{{IncomeBill.taxRate | taxRateFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>来票单位</div>
+                                <div>{{IncomeBill.inCompany}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>开票时间</div>
+                                <div>{{IncomeBill.billCreateDate}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>申请时间</div>
+                                <div disabled>{{IncomeBill.applyDate}}</div>
+                            </div>
+                        </div>
+
+                        <div class="right">
+                            <div class="con con1">
+                                <textarea disabled v-model="reason"></textarea>
+                            </div>
+                            <div class="header">审核原因</div>
+                            <div class="con con2">
+                                <textarea placeholder="请输入审核原因！" v-model="IncomeBill.textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer clearfix">
+                    <div class="fl">
+                        <button type="button" class="btn neworder-btn" @click.prevent="detailBtn(IncomeBill)">
+                            查看详情
+                        </button>
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+
+                    <div class="fr">
+                        <button type="button" class="btn neworder-btn" @click='voidAdopt(0)'>
+                            不作废
+                        </button>
+                        <button type="button" class="btn back-btn" @click='voidAdopt(1)'>
+                            作废
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--发票作废-->
+    <div class="modal fade" id="voidModall" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        发票作废
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="flex-sb-center header">
+                        <div>发票信息</div>
+                        <div>作废原因</div>
+                    </div>
+
+                    <div class="flex-sb-center content">
+                        <div>
+                            <div class="flex-sb-center item">
+                                <div>委托会员</div>
+                                <div>{{member.memberName}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票编号</div>
+                                <div>{{IncomeBill.billCode}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票金额</div>
+                                <div>{{IncomeBill.billTotalAccount | moneyFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票类型</div>
+                                <div>{{IncomeBill.billPaperType}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>税率</div>
+                                <div>{{IncomeBill.taxRate | taxRateFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>来票单位</div>
+                                <div>{{IncomeBill.inCompany}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>开票时间</div>
+                                <div>{{IncomeBill.billCreateDate}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>申请时间</div>
+                                <div disabled>{{IncomeBill.applyDate}}</div>
+                            </div>
+                        </div>
+
+                        <div class="right">
+
+                            <div class="con con3">
+                                <textarea placeholder="请输入作废原因！" v-model="IncomeBill.textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer clearfix">
+                    <div class="fl">
+                        <button type="button" class="btn neworder-btn" @click.prevent="detailBtn(IncomeBill)">
+                            查看详情
+                        </button>
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+
+                    <div class="fr">
+
+                        <button type="button" class="btn back-btn" @click='voidAdopt(1)'>
+                            作废
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--发票信息确认-->
+    <div class="modal fade" id="adoptModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        发票信息确认
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="flex-sb-center header">
+                        <div>发票信息</div>
+                        <div>审核原因</div>
+                    </div>
+
+                    <div class="flex-sb-center content">
+                        <div>
+                            <div class="flex-sb-center item">
+                                <div>委托会员</div>
+                                <div>{{member.memberName}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票编号</div>
+                                <div>{{IncomeBill.billCode}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票金额</div>
+                                <div>{{IncomeBill.billTotalAccount | moneyFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>发票类型</div>
+                                <div>{{IncomeBill.billPaperType}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>税率</div>
+                                <div>{{IncomeBill.taxRate | taxRateFilter}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>来票单位</div>
+                                <div>{{IncomeBill.inCompany}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>开票时间</div>
+                                <div>{{IncomeBill.billCreateDate}}</div>
+                            </div>
+                            <div class="flex-sb-center item">
+                                <div>申请时间</div>
+                                <div>{{IncomeBill.applyDate}}</div>
+                            </div>
+                        </div>
+
+                        <div class="right">
+                            <div class="con con3">
+                                <textarea  placeholder="不通过时请输入审核原因！" v-model="IncomeBill.textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer clearfix">
+                    <div class="fl">
+                        <button type="button" class="btn neworder-btn" @click.prevent="detailBtn(IncomeBill)">
+                            查看详情
+                        </button>
+                        <button type="button" class="btn cancel-btn" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+
+                    <div class="fr">
+                        <button type="button" class="btn back-btn" @click.prevent="examineAdopt(0)">
+                            未通过
+                        </button>
+                        <button type="button" class="btn neworder-btn" @click.prevent="examineAdopt(1)">
+                            通过
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品详情弹窗 -->
+    <div class="modal fade" id="detailModal"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        商品详情
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>商品名称</td>
+                            <td>批号</td>
+                            <td>规格</td>
+                            <td>录票重量</td>
+                            <td>开票重量</td>
+                            <td>仓库</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{goodDetail.good.goodName}}</td>
+                            <td>{{goodDetail.good.batch}}</td>
+                            <td>{{goodDetail.good.spec}}</td>
+                            <td>{{goodDetail.good.inweight}}</td>
+                            <td>{{goodDetail.good.outweight}}</td>
+                            <td>{{goodDetail.good.warehouse}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>发票编码</td>
+                            <td>重量</td>
+                            <td>单价</td>
+                            <td>商品金额</td>
+                            <td>发票类型</td>
+                            <td>开票时间</td>
+                            <td>票据类型</td>
+                            <td>交易客户</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for='(item,index) in goodDetail.goodBills' :key='index' v-cloak>
+                            <td>{{item.billCode}}</td>
+                            <td>{{item.weight}}</td>
+                            <td>{{item.price}}</td>
+                            <td>{{item.money}}</td>
+                            <td>{{item.billPaperType}}</td>
+                            <td>{{item.time}}</td>
+                            <td>{{item.billType}}</td>
+                            <td>{{item.Company}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../js/wang/filters.js"></script>
+<script src="../js/wu/qs.js"></script>
+<script src="../js/wu/utils.js"></script>
+<script src="../js/wu/b-income-ticket-examinedetail.js"></script>
+
+
+<script>
+    // $('#myModal').modal('show')
+</script>
+</body>
+
+</html>
